@@ -119,13 +119,43 @@ if(GTSAM_INSTALL_MATLAB_TOOLBOX)
 endif()
 
 # Install config and export files
-GtsamMakeConfigFile(GTSAM "${CMAKE_CURRENT_SOURCE_DIR}/gtsam_extra.cmake.in")
-export(TARGETS ${GTSAM_EXPORTED_TARGETS} FILE GTSAM-exports.cmake)
+# GtsamMakeConfigFile(GTSAM "${CMAKE_CURRENT_SOURCE_DIR}/gtsam_extra.cmake.in")
+# export(TARGETS ${GTSAM_EXPORTED_TARGETS} FILE GTSAM-exports.cmake)
 
-if (GTSAM_BUILD_UNSTABLE)
-    GtsamMakeConfigFile(GTSAM_UNSTABLE "${CMAKE_CURRENT_SOURCE_DIR}/gtsam_extra.cmake.in")
-    export(TARGETS ${GTSAM_UNSTABLE_EXPORTED_TARGETS} FILE GTSAM_UNSTABLE-exports.cmake)
-endif()
+# if (GTSAM_BUILD_UNSTABLE)
+#     GtsamMakeConfigFile(GTSAM_UNSTABLE "${CMAKE_CURRENT_SOURCE_DIR}/gtsam_extra.cmake.in")
+#     export(TARGETS ${GTSAM_UNSTABLE_EXPORTED_TARGETS} FILE GTSAM_UNSTABLE-exports.cmake)
+# endif()
+
+include(GNUInstallDirs)
+install(TARGETS gtsam
+  EXPORT gtsam_fixedTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  PUBLIC_HEADER DESTINATION include
+)
+install(EXPORT gtsam_fixed
+  FILE gtsam_fixedTargets.cmake
+  NAMESPACE gtsam_fixed::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gtsam_fixed
+)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/gtsam_fixedConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/gtsam_fixedConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gtsam_fixed
+)
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/gtsam_fixedConfig.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gtsam_fixed
+)
+
+# install(
+#     DIRECTORY include/
+#     DESTINATION ${CMAKE_INSTALL_PREFIX}/include
+#     FILES_MATCHING PATTERN "*.h*"
+#     )
 
 # Check for doxygen availability - optional dependency
 find_package(Doxygen)
